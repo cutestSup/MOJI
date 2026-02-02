@@ -97,7 +97,7 @@ export const signIn = async (req, res) => {
         });
 
         // return tokens in cookies
-        res.cookie('accessToken', accessToken, {
+        res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: true,
             sameSite: 'None', // cho backend va frontend khac domain co the nhan cookie
@@ -105,12 +105,70 @@ export const signIn = async (req, res) => {
         });
             
         // return success
-        return res.sendStatus(204).json({ message: `User ${username} signed in successfully` , accessToken});
+        return res
+                .status(200)
+                .json({ message: `User ${user.displayName} signed in successfully`, accessToken });
         
     } catch (error) {
         console.error('Error during sign in:', error);
         return res.status(500).json({ message: 'Internal server error' });
+    }
+};
 
+export const signOut = async (req, res) => {
+    try {  
+        // get refresh token from cookies
+        const refreshToken = req.cookies?.refreshToken;
+
+        if (refreshToken) {
+            // delete session from database
+            await Session.deleteOne({ refreshToken });
+            
+            // clear cookies
+            res.clearCookie("refreshToken");
+        }
+
+        return res.sendStatus(204);
+
+    } catch (error) {
+        console.error('Error during sign out:', error);
+        return res.status(500).json({ message: 'Internal server error' });
     }
 
-}
+};
+
+export const refreshToken = async (req, res) => {
+    try {
+        // get refresh token from cookies
+        const token = req.cookies?.refreshToken; 
+        if (!token) {
+            return res.status(401).json({ message: 'Token not provided' });
+        }
+        // find session
+        const session = await Session
+            .findOne({ refreshToken: token })
+            .populate('userId');
+        if (!session) {
+            return res.status(403).json({ message: 'Invalid token' });
+        }
+
+        // check if session is expired
+        if (session.expireAt < new Date()) {
+            await Session.deleteOne({ refreshToken: token });
+            return res.status(403).json({ message: 'Refresh token has expired' });
+        }
+        const user = session.userId;
+
+        // create new access token
+        const AccessToken = jwt.sign(
+            { userId: user._id },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: ACCESS_TOKEN_TTL }
+        );
+        // return new access token in cookie
+        res.status(200).json({ accessToken: AccessToken });
+    } catch (error) {
+        console.error('Error during token refresh:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
