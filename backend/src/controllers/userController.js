@@ -9,7 +9,8 @@ export const authMe = async (req, res) =>{
         console.error('Error in authMe controller:', error);
         return res.status(500).json({ message: 'Internal Server Error' });
     }
+};
 
-
-
-}
+export const test = async (req, res) => {
+    return res.sendStatus(204);
+};
