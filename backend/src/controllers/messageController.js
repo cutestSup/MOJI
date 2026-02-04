@@ -60,7 +60,13 @@ export const sendGroupMessage = async (req, res) => {
     try {
         const { groupId, content } = req.body;
         const senderId = req.user.id;
+
         // Logic to send a group message
+        if (!content) {
+            return res.status(400).json({ message: 'Message content cannot be empty' });
+        }
+
+        
 
 
     } catch (error) {
