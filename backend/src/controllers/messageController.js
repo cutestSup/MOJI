@@ -58,17 +58,26 @@ export const sendDirectMessage = async (req, res) => {
 
 export const sendGroupMessage = async (req, res) => {
     try {
-        const { groupId, content } = req.body;
+        const {conversationId, content} = req.body;
         const senderId = req.user.id;
+        const conversation = req.conversation; // Set by checkGroupMembership middleware
 
-        // Logic to send a group message
         if (!content) {
             return res.status(400).json({ message: 'Message content cannot be empty' });
         }
 
-        
+        const message = await Message.create({
+            conversationId: conversation._id,
+            senderId,
+            content
+        });
 
+        // Update conversation after creating message
+        updateConversationAfterCreateMessage(conversation, message, senderId);
 
+        await conversation.save();
+
+        return res.status(201).json({ message: 'Message sent successfully', data: message });       
     } catch (error) {
         console.error('Error in sendGroupMessage:', error);
         return res.status(500).json({ message: 'Internal Server Error' });

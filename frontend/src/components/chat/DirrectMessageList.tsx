@@ -15,6 +15,7 @@ const DirrectMessageList = () => {
             {
                 dirrectConversations.map((conv) => (
                     <DirrectMessageCard
+                        key={conv._id}
                         conv = {conv}
                         />
                 ))}
