@@ -22,10 +22,17 @@ export const chatService = {
 
     },
 
-    async sendDirectMessage(recipientId: string, content: string): Promise<void> {
-        await api.post("/messages/direct", { recipientId, content });
-    }   
+    async sendDirectMessage(recipientId: string, content: string = "", imageUlr?: string, conversationId?: string): Promise<void> {
+        const res = await api.post("/messages/direct", { recipientId, content, imageUlr, conversationId });
 
+        return res.data.message;
+    },
     
+    async sendGroupMessage(conversationId: string, content: string = "", imageUlr?: string): Promise<void> {
+        const res = await api.post("/messages/group", { conversationId, content, imageUlr });
+        
+        return res.data.message;
+    }
+       
 
 };

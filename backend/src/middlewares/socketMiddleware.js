@@ -1,0 +1,27 @@
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
+
+export const socketAuthMiddleware = async (socket, next) => {
+    try {
+        const token = socket.handshake.auth?.token;
+
+        if (!token) {
+            return next(new Error('Authentication token is required'));
+        }
+
+        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        if (!decoded)
+            return next(new Error('Invalid token'));
+
+        const user = await User.findById(decoded.id);
+        if (!user) {
+            return next(new Error('User not found'));
+        }
+
+        socket.user = user;
+        next();
+    } catch (error) {
+        console.error('Socket authentication error:', error);
+        next(new Error('Authentication failed'));
+    }
+};

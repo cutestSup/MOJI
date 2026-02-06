@@ -32,7 +32,7 @@ export const useChatStore = create<ChatState>()(
 
                     set({ conversations, convoLoading: false });
                 } catch (error) {
-                    console.error("Lỗi xảy ra khi fetchConversations:", error);
+                    console.error("Error when fetching conversations:", error);
                     set({ convoLoading: false });
                 }
             },
@@ -80,11 +80,90 @@ export const useChatStore = create<ChatState>()(
                         };
                     });
                 } catch (error) {
-                    console.error("Lỗi xảy ra khi fetchMessages:", error);
+                    console.error("Error when fetching messages:", error);
                 } finally {
                     set({ messageLoading: false });
                 }
             },
+
+            sendDirectMessage: async (recipientId, content, imageUlr) => {
+                try {
+                    const { activeConversationId } = get();
+                    await chatService.sendDirectMessage(recipientId, content, imageUlr, activeConversationId || undefined);
+
+                    set((state) => ({
+                        conversations: state.conversations.map((convo) =>
+                            convo._id === activeConversationId ? { ...convo, seenBy: [] } : convo
+                        ),
+                    }));
+                } catch (error) {
+                    console.error("Error when sending direct message:", error);
+                    throw error;
+                }
+            },
+
+            sendGroupMessage: async (conversationId, content, imageUlr) => {
+                try {
+                    const { activeConversationId } = get();
+                    await chatService.sendGroupMessage(conversationId, content, imageUlr);
+
+                    set((state) => ({
+                        conversations: state.conversations.map((convo) =>
+                            convo._id === activeConversationId ? { ...convo, seenBy: [] } : convo
+                        ),
+                    }));
+                } catch (error) {
+                    console.error("Error when sending group message:", error);
+                    throw error;
+                }
+            },
+
+            addMessage: async (message) => {
+                try {
+                    const { user } = useAuthStore.getState();
+                    const { fetchMessages } = get();
+
+                    message.isOwn = message.senderId === user?._id;
+
+                    const convoId = message.conversationId;
+
+                    let prevItems = get().messages[convoId]?.items ?? [];
+
+                    if (prevItems.length === 0) {
+                        await fetchMessages(convoId);
+                        prevItems = get().messages[convoId]?.items ?? [];
+                    }
+
+                    set((state) => {
+                        if (prevItems.some((m) => m._id === message._id)) {
+                            return state;
+                        }
+
+                        return {
+                            messages: {
+                                ...state.messages,
+                                [convoId]: {
+                                    items: [...prevItems, message],
+                                    hasMore: state.messages[convoId]?.hasMore,
+                                    nextCursor: state.messages[convoId]?.nextCursor ?? undefined,
+                                },
+                            },
+                        };
+                    });
+
+                } catch (error) {
+                    console.error("Error when adding message:", error);
+                }
+            },
+
+            updateConversation: (conversation) => {
+                set((state) => ({
+                    conversations: state.conversations.map((convo) =>
+                        convo._id === conversation._id ? {...convo,...conversation} : convo
+                    ),
+                }));
+            },
+
         }),
         {
             name: "chat-storage",

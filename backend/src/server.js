@@ -11,16 +11,17 @@ import { protectedRoute } from './middlewares/authMiddleware.js';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import fs from 'fs';
+import { io, app, server } from './socket/index.js';
 
 
 dotenv.config();
 
-const app = express();
+// const app = express();
 const PORT = process.env.PORT || 5001;
 
 //middlewares
 app.use(cors({
-    origin: process.env.CLIENT_URL ,
+    origin: process.env.CLIENT_URL,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -49,8 +50,8 @@ app.use('/api/conversations', conversationRoute);
 
 //start server
 connectDB().then(() => {
-    app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    server.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
     });
 });
 

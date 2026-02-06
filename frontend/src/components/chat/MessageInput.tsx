@@ -4,16 +4,16 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { ImagePlus, Send } from "lucide-react";
 import { Input } from "../ui/input";
-// import EmojiPicker from "./EmojiPicker";
-import { useChatStore } from "@/stores/useChatStore";
+import EmojiPicker from "./EmojiPicker";
 import { toast } from "sonner";
+import { useChatStore } from "@/stores/useChatStore";
 
 const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation }) => {
   const { user } = useAuthStore();
-  // const { sendDirectMessage, sendGroupMessage } = useChatStore();
+  const { sendDirectMessage, sendGroupMessage } = useChatStore();
   const [value, setValue] = useState("");
 
-  if (!user) return;
+  if (!user) return null;
 
   const sendMessage = async () => {
     if (!value.trim()) return;
@@ -24,13 +24,13 @@ const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation }) => {
       if (selectedConvo.type === "direct") {
         const participants = selectedConvo.participants;
         const otherUser = participants.filter((p) => p._id !== user._id)[0];
-        // await sendDirectMessage(otherUser._id, currValue);
+        await sendDirectMessage(otherUser._id, currValue);
       } else {
-        // await sendGroupMessage(selectedConvo._id, currValue);
+        await sendGroupMessage(selectedConvo._id, currValue);
       }
     } catch (error) {
       console.error(error);
-      toast.error("Lỗi xảy ra khi gửi tin nhắn. Bạn hãy thử lại!");
+      toast.error("Error sending message. Please try again.");
     }
   };
 
@@ -56,7 +56,7 @@ const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation }) => {
           onKeyPress={handleKeyPress}
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          placeholder="Soạn tin nhắn..."
+          placeholder="Type a message..."
           className="pr-20 h-9 bg-white border-border/50 focus:border-primary/50 transition-smooth resize-none"
         ></Input>
         <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
@@ -67,9 +67,9 @@ const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation }) => {
             className="size-8 hover:bg-primary/10 transition-smooth"
           >
             <div>
-              {/* <EmojiPicker
+              <EmojiPicker
                 onChange={(emoji: string) => setValue(`${value}${emoji}`)}
-              /> */}
+              />
             </div>
           </Button>
         </div>

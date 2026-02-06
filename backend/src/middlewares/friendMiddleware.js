@@ -41,9 +41,6 @@ export const checkFriendship = async (req, res, next) => {
         }
 
         next();
-
-        // todo: check group membership for group messages
-
     } catch (error) {
         console.error('Error in checkFriendship middleware:', error);
         return res.status(500).json({ message: 'Internal Server Error' });
