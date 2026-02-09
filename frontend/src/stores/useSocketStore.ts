@@ -13,8 +13,6 @@ export const useSocketStore = create<SocketState>((set, get) => ({
         const accessToken = useAuthStore.getState().accessToken;
         const existingSocket = get().socket;
 
-        console.log("🔌 Attempting to connect socket...");
-        console.log("📍 Socket URL:", baseURL);
         console.log("🔑 Access Token:", accessToken ? "Available" : "Missing");
 
         if (existingSocket) {
@@ -73,7 +71,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
             };
 
             if (useChatStore.getState().activeConversationId === message.conversationId) {
-                // useChatStore.getState().markAsSeen();
+                useChatStore.getState().markAsSeen();
             }
 
             useChatStore.getState().updateConversation(updatedConversation);
@@ -89,12 +87,12 @@ export const useSocketStore = create<SocketState>((set, get) => ({
                 seenBy: conversation.seenBy,
             };
 
-            //   useChatStore.getState().updateConversation(updated);
+            useChatStore.getState().updateConversation(updated);
         });
 
         // new group chat
         socket.on("new-group", (conversation) => {
-            //   useChatStore.getState().addConvo(conversation);
+            useChatStore.getState().addConvo(conversation);
             socket.emit("join-conversation", conversation._id);
         });
     },

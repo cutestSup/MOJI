@@ -174,7 +174,7 @@ export const getFriendRequests = async (req, res) => {
         const populateFields = "_id displayName avatarUrl username";
 
         // find all friend requests where user is the sender or receiver
-        const [sendtRequests, receivedRequests] = await Promise.all([
+        const [sent, received] = await Promise.all([
             FriendRequest.find({ from: userId })
                 .populate("to", populateFields)
                 .lean(),
@@ -185,7 +185,7 @@ export const getFriendRequests = async (req, res) => {
 
 
         return res.status(200).json({ 
-            sendtRequests, receivedRequests
+            sent, received
         });
 
 

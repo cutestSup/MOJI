@@ -1,4 +1,4 @@
-import { useChatStore } from '@/stores/useChatStore'
+import { useChatStore } from '@/stores/useChatStore.ts';
 import DirrectMessageCard from './DirrectMessageCard';
 
 const DirrectMessageList = () => {

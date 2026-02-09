@@ -13,7 +13,7 @@ export const socketAuthMiddleware = async (socket, next) => {
         if (!decoded)
             return next(new Error('Invalid token'));
 
-        const user = await User.findById(decoded.id);
+        const user = await User.findById(decoded.userId).select('-hashedPassword');
         if (!user) {
             return next(new Error('User not found'));
         }

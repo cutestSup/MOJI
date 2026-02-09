@@ -42,7 +42,7 @@ const MessageInput = ({ selectedConvo }: { selectedConvo: Conversation }) => {
   };
 
   return (
-    <div className="flex items-center gap-2 p-3 min-h-[56px] bg-background">
+    <div className="flex items-center gap-2 p-3 min-h-[14] bg-background">
       <Button
         variant="ghost"
         size="icon"
