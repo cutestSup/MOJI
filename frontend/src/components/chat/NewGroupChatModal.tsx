@@ -3,6 +3,7 @@ import { useState } from "react";
 import {
 	Dialog,
 	DialogContent,
+	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
@@ -68,19 +69,21 @@ const NewGroupChatModal = () => {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button
-					variant="ghost"
+				<div 
 					onClick={handleGetFriends}
 					className="flex z-10 justify-center items-center size-5 rounded-full hover:bg-sidebar-accent transition cursor-pointer"
 				>
 					<Users className="size-4" />
 					<span className="sr-only">Tạo nhóm</span>
-				</Button>
+				</div>
 			</DialogTrigger>
 
 			<DialogContent className="sm:max-w-[425px] border-none">
 				<DialogHeader>
 					<DialogTitle className="capitalize">tạo nhóm chat mới</DialogTitle>
+					<DialogDescription className="sr-only">
+						Tạo một nhóm chat mới với bạn bè của bạn
+					</DialogDescription>
 				</DialogHeader>
 
 				<form

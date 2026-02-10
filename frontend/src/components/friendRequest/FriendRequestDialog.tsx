@@ -2,6 +2,7 @@ import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -39,6 +40,9 @@ const FriendRequestDialog = ({ open, setOpen }: FriendRequestDialogProps) => {
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Lời mời kết bạn</DialogTitle>
+          <DialogDescription className="sr-only">
+            Quản lý lời mời kết bạn đã nhận và đã gửi
+          </DialogDescription>
         </DialogHeader>
         <Tabs
           value={tab}
